@@ -16,13 +16,15 @@
 #endif
 
 #ifdef USE_TLS
-  #ifdef ESP8266
+#ifdef ESP8266
     #include <WiFiClientSecureBearSSL.h>
     #include <BearSSLHelpers.h>
   #elif defined(ESP32)
     #include <WiFiClientSecure.h>
   #endif
-  #include "Certs.h"
+  #ifdef USE_TLS_CERTS
+    #include "Certs.h"
+  #endif
 #endif
 
 #ifdef USE_TLS
@@ -47,9 +49,11 @@ class MyDeviceProperties {
 public:
   MyDeviceProperties(size_t eepromSize = 512, size_t eepromOffset = 0,
                      size_t reservedTailBytes = 3, size_t jsonCapacity = 512,
-                     bool verifyCert = false);
+                     bool verifyCert = true);
 
   bool begin(const char *serverAddress, const char *deviceTypeId);
+  bool begin(const char *serverAddress, const char *deviceTypeId,
+             size_t eepromOffset);
   bool fetchAndStoreIfChanged();
   bool loadFromEEPROM();
   JsonDocument &json();
@@ -69,7 +73,7 @@ private:
   JsonDocument doc;
   String cachedPayload;
 #ifdef USE_TLS
-  #ifdef ESP8266
+  #if defined(USE_TLS_CERTS) && defined(ESP8266)
     BearSSL::X509List trustedRoots;
   #endif
 #endif

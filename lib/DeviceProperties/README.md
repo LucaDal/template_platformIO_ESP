@@ -24,12 +24,14 @@ void setup() {
   Serial.begin(115200);
   // connect WiFi here...
 
-  props.begin(PORTAL_SERVER_IP, DEVICE_TYPE_ID); // loads cached payload from EEPROM
+  // Optional third argument sets EEPROM offset (defaults to 0 or ctor value)
+  props.begin(PORTAL_SERVER_IP, DEVICE_TYPE_ID); 
+  // props.begin(PORTAL_SERVER_IP, DEVICE_TYPE_ID, 16); // with explicit offset
   props.fetchAndStoreIfChanged();                // fetches and saves if different
 
   JsonDocument &doc = props.json();
-  const char* name = doc["nome cubo"]["value"] | "";
-  Serial.println(name);
+  const char* propName = doc["key"] | "";
+  Serial.println(propName);
 }
 
 void loop() {
@@ -39,9 +41,8 @@ void loop() {
 ```
 
 ## HTTPS
-- Build with `-DUSE_TLS`.
-- Constructor argument `verifyCert=true` enforces CA validation (Let’s Encrypt roots from `Certs.h`).
-- `verifyCert=false` keeps HTTPS transport but skips validation.
+- Build with `-DUSE_TLS` to enable HTTPS. Without it, only HTTP is used.
+- Constructor argument `verifyCert=true` enables CA validation (Let’s Encrypt roots) on ESP8266/ESP32; `false` calls `setInsecure()` (lighter but no validation).
 
 ## Debug
 - Uncomment `//#define DEBUG` in `MyDeviceProperties.h` (or add `-DDEBUG` to build flags) to enable `*MyProps:` logs.

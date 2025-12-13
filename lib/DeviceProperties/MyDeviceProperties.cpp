@@ -8,29 +8,45 @@ MyDeviceProperties::MyDeviceProperties(size_t eepromSize, size_t eepromOffset,
   (void)jsonCapacity;
 #ifdef USE_TLS
   #ifdef ESP8266
-    trustedRoots.append(cert_ISRG_X1);
-    trustedRoots.append(cert_ISRG_X2);
-    if (verifyCert) {
-      client->setTrustAnchors(&trustedRoots);
-      client->setSSLVersion(BR_TLS12, BR_TLS12);
-    } else {
+    #ifdef USE_TLS_CERTS
+      trustedRoots.append(cert_ISRG_X1);
+      trustedRoots.append(cert_ISRG_X2);
+      if (verifyCert) {
+        client->setTrustAnchors(&trustedRoots);
+        client->setSSLVersion(BR_TLS12, BR_TLS12);
+      } else {
+        client->setInsecure();
+      }
+    #else
       client->setInsecure();
-    }
+    #endif
   #elif defined(ESP32)
-    if (verifyCert) {
-      client->setCACert(cert_ISRG_X1);
-    } else {
+    #ifdef USE_TLS_CERTS
+      if (verifyCert) {
+        client->setCACert(cert_ISRG_X1);
+      } else {
+        client->setInsecure();
+      }
+    #else
       client->setInsecure();
-    }
+    #endif
   #endif
 #endif
 }
 
 bool MyDeviceProperties::begin(const char *serverAddress,
                                const char *deviceTypeId) {
+  return begin(serverAddress, deviceTypeId, this->eepromOffset);
+}
+
+bool MyDeviceProperties::begin(const char *serverAddress,
+                               const char *deviceTypeId,
+                               size_t eepromOffset) {
   this->serverAddress = serverAddress;
   this->deviceTypeId = deviceTypeId;
-  MYPROPS_LOGF("begin server=%s device=%s\n", serverAddress, deviceTypeId);
+  this->eepromOffset = eepromOffset;
+  MYPROPS_LOGF("begin server=%s device=%s offset=%u\n", serverAddress,
+               deviceTypeId, static_cast<unsigned>(eepromOffset));
   EEPROM.begin(eepromSize);
   return loadFromEEPROM();
 }
@@ -71,6 +87,7 @@ String MyDeviceProperties::readPayloadFromEEPROM() {
 bool MyDeviceProperties::saveToEEPROM(const String &payload) {
   size_t space = availableStorage();
   if (payload.length() > space) {
+    MYPROPS_LOG("not enough space on eeprom");
     return false;
   }
   uint16_t len = static_cast<uint16_t>(payload.length());
