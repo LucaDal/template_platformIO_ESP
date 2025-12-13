@@ -1,3 +1,3 @@
-[submodule "lib/MyESP_OTA"]
-	path = lib/MyESP_OTA
-	url = https://github.com/LucaDal/MyESP_OTA.git
+[submodule "my-esp-libraries"]
+	path = my-esp-libraries
+	url = https://github.com/LucaDal/my-esp-libraries.git
