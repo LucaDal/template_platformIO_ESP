@@ -22,7 +22,6 @@ Uncomment the lines (remove the leading `;`) in the `[env]` section to turn them
 - Monitor: `pio device monitor -e esp8266`.
 
 ## Libraries included
-- **WiFiManager**: simplifies Wi-Fi provisioning and captive portal setup.
 - **ArduinoJson**: JSON parsing and serialization.
 
 Use these libraries directly in your firmware under `src/`, the dependencies are already declared in `platformio.ini`.
