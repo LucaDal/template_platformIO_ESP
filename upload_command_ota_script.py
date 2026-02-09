@@ -12,10 +12,14 @@ def get_address_ip_from_header():
     base_dir = Path(__file__).resolve().parent
     header_path = base_dir / "include/secret_data.h"
 
+    if not header_path.is_file():
+        raise FileNotFoundError(f"File non trovato: {header_path}")
+
     text = header_path.read_text(encoding="utf-8")
 
-    match_ip = re.search(r'const\s+char\s*\*\s*PORTAL_SERVER_IP\s*=\s*"([^"]*)"', text)
-    match_token = re.search(r'const\s+char\s*\*\s*DEVICE_TYPE_ID\s*=\s*"([^"]*)"', text)
+    # Consente eventuali qualificatori (es. PROGMEM) fra [] e l'assegnazione.
+    match_ip = re.search(r'PORTAL_SERVER_IP\s*\[\][^=]*=\s*"([^"]*)"', text)
+    match_token = re.search(r'DEVICE_TYPE_ID\s*\[\][^=]*=\s*"([^"]*)"', text)
 
     if not match_ip:
         raise ValueError("PORTAL_SERVER_IP non trovato in {}".format(header_path))
