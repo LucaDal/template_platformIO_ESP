@@ -1,0 +1,18 @@
+{
+  "devices": [
+    {
+      "device_id": "esp32c3-0001",
+      "env": "esp32-c3",
+      "cert": "/absolute/path/to/certs/esp32c3-0001/client.crt",
+      "key": "/absolute/path/to/certs/esp32c3-0001/client.key",
+      "ca": "/absolute/path/to/certs/ca.crt"
+    },
+    {
+      "device_id": "esp8266-0001",
+      "env": "esp8266",
+      "cert": "/absolute/path/to/certs/esp8266-0001/client.crt",
+      "key": "/absolute/path/to/certs/esp8266-0001/client.key",
+      "ca": "/absolute/path/to/certs/ca.crt"
+    }
+  ]
+}

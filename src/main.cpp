@@ -9,31 +9,34 @@ SimpleOTA *simpleOTA = new SimpleOTA();
 MyDeviceProperties deviceProperties;
 LiteWiFiManager wifiProvision;
 DeviceSetupManager setupMgr;
-const char *DEVICE_ID;
+String deviceId;
 
 void setup() {
   Serial.begin(115200);
-  // Try stored credentials; fall back to minimal portal if needed.
   wifiProvision.begin("ProjectSetup");
 
-  size_t nextOffset = 0;
-  // Setup device previously settled up
-  setupMgr.begin();
-  DEVICE_ID = setupMgr.readCString(0, &nextOffset);
-  Serial.printf("DEVICE ID [%s]\n", DEVICE_ID);
+  if (!setupMgr.begin()) {
+    Serial.println("DeviceSetupManager begin failed");
+  } else {
+    deviceId = setupMgr.readDeviceId();
+    if (deviceId.isEmpty()) {
+      Serial.println("Device ID not settled. please provide one.");
+    }
+  }
 
-  if (WiFi.status() == WL_CONNECTED) {
-    deviceProperties.begin(PORTAL_SERVER_IP, DEVICE_ID, nextOffset);
+  Serial.printf("DEVICE ID [%s]\n", deviceId.c_str());
+
+  if (WiFi.status() == WL_CONNECTED && !deviceId.isEmpty()) {
+    deviceProperties.begin(PORTAL_SERVER_IP, deviceId.c_str());
     deviceProperties.fetchAndStoreIfChanged();
-    simpleOTA->begin(512, PORTAL_SERVER_IP, DEVICE_ID, true);
+    simpleOTA->begin(PORTAL_SERVER_IP, deviceId.c_str(), true);
   }
 }
 
 void loop() {
   wifiProvision.loop();
   simpleOTA->checkUpdates(300);
-  JsonDocument &doc = deviceProperties.json();
-  const char *propName = doc["pub_topic"] | "";
+  const char *propName = deviceProperties.Get("pub_topic");
   Serial.println(propName);
   delay(5000);
 }

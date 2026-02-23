@@ -8,9 +8,9 @@ URL_VERSION="https://{}/ota/type/{}/version"
 URL_UPLOAD="https://{}/ota/upload"
 
 def get_address_ip_from_header():
-    # cartella dove si trova questo script
-    base_dir = Path(__file__).resolve().parent
-    header_path = base_dir / "include/secret_data.h"
+    # Script is in scripts/, include/ is in project root.
+    project_root = Path(__file__).resolve().parent.parent
+    header_path = project_root / "include/secret_data.h"
 
     if not header_path.is_file():
         raise FileNotFoundError(f"File non trovato: {header_path}")

@@ -1,7 +1,25 @@
-.pio
+# PlatformIO build output
+.pio/
+
+# IDE/editor
 .vscode/.browse.c_cpp.db*
 .vscode/c_cpp_properties.json
 .vscode/launch.json
-.vscode/ipch
-.cache
+.vscode/ipch/
+
+# Local caches and generated metadata
+.cache/
 compile_commands.json
+
+# Python artifacts
+__pycache__/
+*.pyc
+
+# Local provisioning inventory (contains absolute paths / sensitive refs)
+provisioning/devices.json
+
+# Provisioning payload generated per-device (contains secrets)
+data/provisioning/device_id.txt
+data/provisioning/client.crt
+data/provisioning/client.key
+data/provisioning/ca.crt
