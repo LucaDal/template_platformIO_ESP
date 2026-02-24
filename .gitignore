@@ -15,8 +15,8 @@ compile_commands.json
 __pycache__/
 *.pyc
 
-# Local provisioning inventory (contains absolute paths / sensitive refs)
-provisioning/devices.json
+# Optional local provisioning inventory (contains absolute paths / sensitive refs)
+devices.json
 
 # Provisioning payload generated per-device (contains secrets)
 data/provisioning/device_id.txt

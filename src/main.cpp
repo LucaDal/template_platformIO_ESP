@@ -2,8 +2,11 @@
 #include "LiteWiFiManager.h"
 #include "MyDeviceProperties.h"
 #include "SimpleOTA.h"
+#include <CommonDebug.h>
 #include "secret_data.h"
 #include <Arduino.h>
+
+#define LOG(fmt, ...) DBG_LOGF("*MAIN:", fmt, ##__VA_ARGS__)
 
 SimpleOTA *simpleOTA = new SimpleOTA();
 MyDeviceProperties deviceProperties;
@@ -16,15 +19,15 @@ void setup() {
   wifiProvision.begin("ProjectSetup");
 
   if (!setupMgr.begin()) {
-    Serial.println("DeviceSetupManager begin failed");
+    LOG("DeviceSetupManager begin failed\n");
   } else {
     deviceId = setupMgr.readDeviceId();
     if (deviceId.isEmpty()) {
-      Serial.println("Device ID not settled. please provide one.");
+      LOG("Device ID not settled. please provide one.\n");
     }
   }
 
-  Serial.printf("DEVICE ID [%s]\n", deviceId.c_str());
+  LOG("DEVICE ID [%s]\n", deviceId.c_str());
 
   if (WiFi.status() == WL_CONNECTED && !deviceId.isEmpty()) {
     deviceProperties.begin(PORTAL_SERVER_IP, deviceId.c_str());
@@ -37,6 +40,6 @@ void loop() {
   wifiProvision.loop();
   simpleOTA->checkUpdates(300);
   const char *propName = deviceProperties.Get("pub_topic");
-  Serial.println(propName);
+  LOG("pub_topic=%s\n", propName);
   delay(5000);
 }

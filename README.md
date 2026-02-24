@@ -23,12 +23,16 @@ Uncomment the lines (remove the leading `;`) in the `[env]` section to turn them
 
 ## Device provisioning via JSON
 - Use `scripts/provision.py` to provision one device from a JSON inventory and run PlatformIO targets automatically.
-- Copy `provisioning/devices.example.json` to `provisioning/devices.json` and set your values.
-- `cert`, `key`, and `ca` fields must be absolute file paths.
+- Use an external config file (default: `~/.config/pio-provision/devices.json`).
+- Start from the template in `scripts/templates/devices.example.json`.
+- Set `project_dir` in each device entry to the absolute PlatformIO project path.
+- Set `assets_root` as an absolute directory path, then use relative paths in `cert`, `key`, and `ca`.
+- Absolute paths in `cert`, `key`, and `ca` are still supported.
 
 Examples:
-- Full provisioning (filesystem + firmware): `python3 scripts/provision.py esp32c3-0001`
+- Full provisioning (filesystem + firmware): `python3 scripts/provision.py esp32c3-0001 --config ~/.config/pio-provision/devices.json`
 - Custom absolute config path: `python3 scripts/provision.py esp32c3-0001 --config /abs/path/devices.json`
+- Override project path from CLI: `python3 scripts/provision.py esp32c3-0001 --project-dir /abs/path/project`
 - Filesystem only (no firmware upload): `python3 scripts/provision.py esp32c3-0001 --skip-firmware-upload`
 
 ## Libraries included
