@@ -21,19 +21,10 @@ Uncomment the lines (remove the leading `;`) in the `[env]` section to turn them
 - Upload (OTA envs): `pio run -e esp8266-ota -t upload` (uses the custom OTA uploader script).
 - Monitor: `pio device monitor -e esp8266`.
 
-## Device provisioning via JSON
-- Use `scripts/provision.py` to provision one device from a JSON inventory and run PlatformIO targets automatically.
-- Use an external config file (default: `~/.config/pio-provision/devices.json`).
-- Start from the template in `scripts/templates/devices.example.json`.
-- Set `project_dir` in each device entry to the absolute PlatformIO project path.
-- Set `assets_root` as an absolute directory path, then use relative paths in `cert`, `key`, and `ca`.
-- Absolute paths in `cert`, `key`, and `ca` are still supported.
-
-Examples:
-- Full provisioning (filesystem + firmware): `python3 scripts/provision.py esp32c3-0001 --config ~/.config/pio-provision/devices.json`
-- Custom absolute config path: `python3 scripts/provision.py esp32c3-0001 --config /abs/path/devices.json`
-- Override project path from CLI: `python3 scripts/provision.py esp32c3-0001 --project-dir /abs/path/project`
-- Filesystem only (no firmware upload): `python3 scripts/provision.py esp32c3-0001 --skip-firmware-upload`
+## OTA upload configuration
+- Create a local `.env` file starting from `.env.example`.
+- Set `PORTAL_SERVER_IP` and `DEVICE_TYPE_ID` in `.env`, or export `OTA_SERVER` and `OTA_DEVICE_TYPE_ID` in the shell before running `pio`.
+- When you run `pio run -e esp8266-ota -t upload`, `scripts/upload_command_ota_script.py` loads those values and sends the firmware to the OTA endpoint.
 
 ## Libraries included
 - **ArduinoJson**: JSON parsing and serialization.

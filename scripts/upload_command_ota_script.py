@@ -1,31 +1,58 @@
 import json
-from requests import get, post
+import os
 import sys
-import re
 from pathlib import Path
+
+from requests import get, post
 
 URL_VERSION="https://{}/ota/type/{}/version"
 URL_UPLOAD="https://{}/ota/upload"
+ENV_FILE_NAME = ".env"
 
-def get_address_ip_from_header():
-    # Script is in scripts/, include/ is in project root.
+
+def load_dotenv(env_path: Path) -> dict[str, str]:
+    values: dict[str, str] = {}
+
+    if not env_path.is_file():
+        return values
+
+    for raw_line in env_path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+
+        key, value = line.split("=", 1)
+        key = key.strip()
+        value = value.strip().strip('"').strip("'")
+        if key:
+            values[key] = value
+
+    return values
+
+
+def get_ota_config():
     project_root = Path(__file__).resolve().parent.parent
-    header_path = project_root / "include/secret_data.h"
+    env_path = project_root / ENV_FILE_NAME
+    dotenv_values = load_dotenv(env_path)
 
-    if not header_path.is_file():
-        raise FileNotFoundError(f"File non trovato: {header_path}")
+    ip = os.environ.get("OTA_SERVER") or os.environ.get("PORTAL_SERVER_IP")
+    token = os.environ.get("OTA_DEVICE_TYPE_ID") or os.environ.get("DEVICE_TYPE_ID")
 
-    text = header_path.read_text(encoding="utf-8")
+    if not ip:
+        ip = dotenv_values.get("OTA_SERVER") or dotenv_values.get("PORTAL_SERVER_IP")
+    if not token:
+        token = dotenv_values.get("OTA_DEVICE_TYPE_ID") or dotenv_values.get("DEVICE_TYPE_ID")
 
-    # Consente eventuali qualificatori (es. PROGMEM) fra [] e l'assegnazione.
-    match_ip = re.search(r'PORTAL_SERVER_IP\s*\[\][^=]*=\s*"([^"]*)"', text)
-    match_token = re.search(r'DEVICE_TYPE_ID\s*\[\][^=]*=\s*"([^"]*)"', text)
+    if not ip:
+        raise ValueError(
+            f"PORTAL_SERVER_IP/OTA_SERVER non trovato in env o {env_path}"
+        )
+    if not token:
+        raise ValueError(
+            f"DEVICE_TYPE_ID/OTA_DEVICE_TYPE_ID non trovato in env o {env_path}"
+        )
 
-    if not match_ip:
-        raise ValueError("PORTAL_SERVER_IP non trovato in {}".format(header_path))
-    if not match_token:
-        raise ValueError("DEVICE_TYPE_ID non trovato in {}".format(header_path))
-    return (match_ip.group(1),match_token.group(1))
+    return (ip, token)
 
 
 def get_version_from_TOKEN(ip, token):
@@ -124,7 +151,7 @@ def start_upload(firmware_path, token, ip):
         print("Error on updating: ", res.text)
 
 def main():
-    ip,token = get_address_ip_from_header()
+    ip,token = get_ota_config()
     print("executing script with: " ,ip, token, flush=True)
     start_upload(sys.argv[1],token, ip)
 
