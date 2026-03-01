@@ -24,6 +24,9 @@ void setup() {
   if (strlen(setupMgr.deviceId()) == 0) {
     LOG("Device ID not settled. please provide one.\n");
   }
+  if (strlen(setupMgr.deviceSecret()) == 0) {
+    LOG("Device secret not settled. please provide one.\n");
+  }
   if (strlen(setupMgr.deviceTypeId()) == 0) {
     LOG("Device type ID not settled. please provide one.\n");
   }
@@ -33,11 +36,14 @@ void setup() {
 
   if (WiFi.status() == WL_CONNECTED &&
       strlen(setupMgr.deviceId()) > 0 &&
+      strlen(setupMgr.deviceSecret()) > 0 &&
       strlen(setupMgr.deviceTypeId()) > 0 &&
       strlen(setupMgr.portalServerIp()) > 0) {
-    deviceProperties.begin(setupMgr.portalServerIp(), setupMgr.deviceId());
+    deviceProperties.begin(setupMgr.portalServerIp(), setupMgr.deviceId(),
+                           setupMgr.deviceSecret());
     deviceProperties.fetchAndStoreIfChanged();
-    simpleOTA->begin(setupMgr.portalServerIp(), setupMgr.deviceTypeId(), true);
+    simpleOTA->begin(setupMgr.portalServerIp(), setupMgr.deviceTypeId(),
+                     setupMgr.deviceId(), setupMgr.deviceSecret(), true);
   }
 }
 

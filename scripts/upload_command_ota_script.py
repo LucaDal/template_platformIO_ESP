@@ -1,3 +1,4 @@
+import base64
 import json
 import os
 import sys
@@ -5,8 +6,8 @@ from pathlib import Path
 
 from requests import get, post
 
-URL_VERSION="https://{}/ota/type/{}/version"
-URL_UPLOAD="https://{}/ota/upload"
+URL_VERSION = "https://{}/ota/version"
+URL_UPLOAD = "https://{}/ota/upload"
 ENV_FILE_NAME = ".env"
 
 
@@ -36,35 +37,62 @@ def get_ota_config():
     dotenv_values = load_dotenv(env_path)
 
     ip = os.environ.get("OTA_SERVER") or os.environ.get("PORTAL_SERVER_IP")
-    token = os.environ.get("OTA_DEVICE_TYPE_ID") or os.environ.get("DEVICE_TYPE_ID")
+    device_type_id = os.environ.get("OTA_DEVICE_TYPE_ID") or os.environ.get("DEVICE_TYPE_ID")
+    email = os.environ.get("OTA_EMAIL")
+    password = os.environ.get("OTA_PASSWORD")
 
     if not ip:
         ip = dotenv_values.get("OTA_SERVER") or dotenv_values.get("PORTAL_SERVER_IP")
-    if not token:
-        token = dotenv_values.get("OTA_DEVICE_TYPE_ID") or dotenv_values.get("DEVICE_TYPE_ID")
+    if not device_type_id:
+        device_type_id = dotenv_values.get("OTA_DEVICE_TYPE_ID") or dotenv_values.get("DEVICE_TYPE_ID")
+    if not email:
+        email = dotenv_values.get("OTA_EMAIL")
+    if not password:
+        password = dotenv_values.get("OTA_PASSWORD")
 
     if not ip:
         raise ValueError(
             f"PORTAL_SERVER_IP/OTA_SERVER non trovato in env o {env_path}"
         )
-    if not token:
+    if not device_type_id:
         raise ValueError(
             f"DEVICE_TYPE_ID/OTA_DEVICE_TYPE_ID non trovato in env o {env_path}"
         )
+    if not email:
+        raise ValueError(f"OTA_EMAIL non trovato in env o {env_path}")
+    if not password:
+        raise ValueError(f"OTA_PASSWORD non trovato in env o {env_path}")
 
-    return (ip, token)
+    return ip, device_type_id, email, password
 
 
-def get_version_from_TOKEN(ip, token):
-    data_TOKEN = get(URL_VERSION.format(ip,token)).text
-    if data_TOKEN == "none" or data_TOKEN is None:
+def build_auth_header(email: str, password: str) -> str:
+    credentials = f"{email}:{password}".encode("utf-8")
+    return "Basic " + base64.b64encode(credentials).decode("ascii")
+
+
+def build_headers(device_type_id: str, email: str, password: str) -> dict[str, str]:
+    return {
+        "Authorization": build_auth_header(email, password),
+        "x-device-type-id": device_type_id,
+    }
+
+
+def get_version_from_token(ip, device_type_id, email, password):
+    response = get(
+        URL_VERSION.format(ip),
+        headers=build_headers(device_type_id, email, password),
+        timeout=30,
+    )
+    data_token = response.text
+    if data_token == "none" or data_token is None:
         return None
-    returned = json.loads(data_TOKEN)
+    returned = json.loads(data_token)
     if "error" in returned:
         print(returned["error"])
         return None
-    print("current build: {}".format(data_TOKEN), flush=True)
-    return json.loads(data_TOKEN)["version"]
+    print("current build: {}".format(data_token), flush=True)
+    return returned["version"]
 
 
 def get_latest_version(current_version: list[int], bump: str = "patch") -> str:
@@ -118,10 +146,10 @@ def ask_version_bump(current_version: list[int]) -> str:
         return "same"
     return "patch"
 
-def start_upload(firmware_path, token, ip):
-    version = get_version_from_TOKEN(ip,token)
+def start_upload(firmware_path, device_type_id, ip, email, password):
+    version = get_version_from_token(ip, device_type_id, email, password)
     if version is None:
-        print("No board for token: [{}]".format(token))
+        print("No board for device type: [{}]".format(device_type_id))
         return
 
     current_int_version = list(map(lambda x: int(x),version.split(".")))
@@ -138,10 +166,13 @@ def start_upload(firmware_path, token, ip):
 
     res = post(
         url=URL_UPLOAD.format(ip),
-        data={'token': token, 'version': new_version},
-        files= {'file': open(firmware_path,'rb')})
+        headers=build_headers(device_type_id, email, password),
+        data={'version': new_version},
+        files={'file': open(firmware_path,'rb')},
+        timeout=60,
+    )
     if res.ok:
-        result = json.loads(res.text)["ok"]
+        result = json.loads(res.text)
         banner = "=" * 55
         print(f"\n{banner}")
         print("OTA UPDATE STATUS: SUCCESS")
@@ -151,9 +182,9 @@ def start_upload(firmware_path, token, ip):
         print("Error on updating: ", res.text)
 
 def main():
-    ip,token = get_ota_config()
-    print("executing script with: " ,ip, token, flush=True)
-    start_upload(sys.argv[1],token, ip)
+    ip, device_type_id, email, password = get_ota_config()
+    print("executing script with: ", ip, device_type_id, flush=True)
+    start_upload(sys.argv[1], device_type_id, ip, email, password)
 
 
 if __name__ == "__main__":

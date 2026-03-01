@@ -23,8 +23,8 @@ Uncomment the lines (remove the leading `;`) in the `[env]` section to turn them
 
 ## OTA upload configuration
 - Create a local `.env` file starting from `.env.example`.
-- Set `PORTAL_SERVER_IP` and `DEVICE_TYPE_ID` in `.env`, or export `OTA_SERVER` and `OTA_DEVICE_TYPE_ID` in the shell before running `pio`.
-- When you run `pio run -e esp8266-ota -t upload`, `scripts/upload_command_ota_script.py` loads those values and sends the firmware to the OTA endpoint.
+- Set `PORTAL_SERVER_IP`, `DEVICE_TYPE_ID`, `OTA_EMAIL`, and `OTA_PASSWORD` in `.env`, or export `OTA_SERVER`, `OTA_DEVICE_TYPE_ID`, `OTA_EMAIL`, and `OTA_PASSWORD` in the shell before running `pio`.
+- When you run `pio run -e esp8266-ota -t upload`, `scripts/upload_command_ota_script.py` reads the current version from `/ota/version` using `Authorization: Basic` plus `x-device-type-id`, asks how to bump it, and then uploads the firmware to `/ota/upload` with the same headers.
 
 ## Libraries included
 - **ArduinoJson**: JSON parsing and serialization.
