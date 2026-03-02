@@ -16,13 +16,7 @@ __pycache__/
 *.pyc
 
 # Optional local provisioning inventory (contains absolute paths / sensitive refs)
-devices.json
 .env
 
 # Provisioning payload generated per-device (contains secrets)
-data/provisioning/device_id.txt
-data/provisioning/device_type_id.txt
-data/provisioning/portal_server_ip.txt
-data/provisioning/client.crt
-data/provisioning/client.key
-data/provisioning/ca.crt
+data/provisioning
