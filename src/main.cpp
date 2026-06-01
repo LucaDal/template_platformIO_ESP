@@ -14,6 +14,9 @@ LiteWiFiManager wifiProvision;
 DeviceSetupManager setupMgr;
 MQTTManager mqttManager;
 
+const char *mqttBroker;
+const char *mqttTopic;
+
 void mqttCallback(char *topic, uint8_t *payload, unsigned int length) {
     LOG("mqtt topic=%s len=%u\n", topic, length);
 }
@@ -24,9 +27,7 @@ void connectToMQTT() {
     if (strlen(mqttBroker) == 0 || strlen(mqttTopic) == 0) {
         return;
     }
-
-    String clientId = "esp-client-" + String(WiFi.macAddress());
-    if (mqttManager.connect(clientId.c_str())) {
+    if (mqttManager.connect(setupMgr.deviceId())) {
         LOG("Connected to MQTT broker\n");
         mqttManager.subscribe(mqttTopic);
     } else {
@@ -49,10 +50,12 @@ void setup() {
         deviceProperties.fetchAndStoreIfChanged();
         simpleOTA->begin(setupMgr.portalServerIp(), setupMgr.deviceTypeId(),
                          setupMgr.deviceId(), setupMgr.deviceSecret(), true);
-        if (mqttManager.begin(deviceProperties.Get("MQTT_BROKER"),
-                              static_cast<uint16_t>(
-                                  deviceProperties.GetInt("MQTT_PORT", 8883)),
-                              mqttCallback)) {
+
+        mqttBroker = deviceProperties.Get("MQTT_BROKER");
+        mqttTopic = deviceProperties.Get("topic");
+        uint16_t port =
+            static_cast<uint16_t>(deviceProperties.GetInt("MQTT_PORT", 8884));
+        if (mqttManager.begin(mqttBroker, port, mqttCallback)) {
             connectToMQTT();
         }
     }
