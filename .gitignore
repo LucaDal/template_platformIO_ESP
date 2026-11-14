@@ -17,6 +17,9 @@ __pycache__/
 
 # Optional local provisioning inventory (contains absolute paths / sensitive refs)
 .env
+.venv-provisioning/
+provisioning-qr/
 
 # Provisioning payload generated per-device (contains secrets)
-data/provisioning
+data/provisioning/*
+!data/provisioning/ca.crt

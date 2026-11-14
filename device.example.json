@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "portalServer": "example.com/api",
+  "deviceCode": "DEVICE-01",
+  "deviceTypeId": "sensor",
+  "deviceSecret": "replace-with-the-device-secret",
+  "wifi_ssid": "ProjectSetup-A1B2"
+}

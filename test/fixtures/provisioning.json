@@ -1,0 +1,127 @@
+[
+  {
+    "name": "valid",
+    "valid": true,
+    "source": "{\"version\":1,\"portalServer\":\"portal.test/api\",\"deviceCode\":\"device-01\",\"deviceTypeId\":\"sensor\",\"deviceSecret\":\"provisioning-secret\",\"wifi_ssid\":\"ProjectSetup-A1B2\"}"
+  },
+  {
+    "name": "ssid-32-ascii",
+    "valid": true,
+    "source": "{\"version\":1,\"portalServer\":\"portal.test/api\",\"deviceCode\":\"device-01\",\"deviceTypeId\":\"sensor\",\"deviceSecret\":\"provisioning-secret\",\"wifi_ssid\":\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"}"
+  },
+  {
+    "name": "ssid-32-utf8",
+    "valid": true,
+    "source": "{\"version\":1,\"portalServer\":\"portal.test/api\",\"deviceCode\":\"device-01\",\"deviceTypeId\":\"sensor\",\"deviceSecret\":\"provisioning-secret\",\"wifi_ssid\":\"éééééééééééééééé\"}"
+  },
+  {
+    "name": "exact-spaces",
+    "valid": true,
+    "source": "{\"version\":1,\"portalServer\":\"portal.test/api\",\"deviceCode\":\"device-01\",\"deviceTypeId\":\"sensor\",\"deviceSecret\":\"provisioning-secret\",\"wifi_ssid\":\" Setup WiFi \"}"
+  },
+  {
+    "name": "version-bool",
+    "valid": false,
+    "source": "{\"version\":true,\"portalServer\":\"portal.test/api\",\"deviceCode\":\"device-01\",\"deviceTypeId\":\"sensor\",\"deviceSecret\":\"provisioning-secret\",\"wifi_ssid\":\"ProjectSetup-A1B2\"}"
+  },
+  {
+    "name": "version-float",
+    "valid": false,
+    "source": "{\"version\":1.0,\"portalServer\":\"portal.test/api\",\"deviceCode\":\"device-01\",\"deviceTypeId\":\"sensor\",\"deviceSecret\":\"provisioning-secret\",\"wifi_ssid\":\"ProjectSetup-A1B2\"}"
+  },
+  {
+    "name": "version-unknown",
+    "valid": false,
+    "source": "{\"version\":2,\"portalServer\":\"portal.test/api\",\"deviceCode\":\"device-01\",\"deviceTypeId\":\"sensor\",\"deviceSecret\":\"provisioning-secret\",\"wifi_ssid\":\"ProjectSetup-A1B2\"}"
+  },
+  {
+    "name": "ssid-over-limit",
+    "valid": false,
+    "source": "{\"version\":1,\"portalServer\":\"portal.test/api\",\"deviceCode\":\"device-01\",\"deviceTypeId\":\"sensor\",\"deviceSecret\":\"provisioning-secret\",\"wifi_ssid\":\"ééééééééééééééééé\"}"
+  },
+  {
+    "name": "ssid-bool",
+    "valid": false,
+    "source": "{\"version\":1,\"portalServer\":\"portal.test/api\",\"deviceCode\":\"device-01\",\"deviceTypeId\":\"sensor\",\"deviceSecret\":\"provisioning-secret\",\"wifi_ssid\":true}"
+  },
+  {
+    "name": "secret-empty",
+    "valid": false,
+    "source": "{\"version\":1,\"portalServer\":\"portal.test/api\",\"deviceCode\":\"device-01\",\"deviceTypeId\":\"sensor\",\"deviceSecret\":\"\",\"wifi_ssid\":\"ProjectSetup-A1B2\"}"
+  },
+  {
+    "name": "secret-null",
+    "valid": false,
+    "source": "{\"version\":1,\"portalServer\":\"portal.test/api\",\"deviceCode\":\"device-01\",\"deviceTypeId\":\"sensor\",\"deviceSecret\":null,\"wifi_ssid\":\"ProjectSetup-A1B2\"}"
+  },
+  {
+    "name": "secret-bool",
+    "valid": false,
+    "source": "{\"version\":1,\"portalServer\":\"portal.test/api\",\"deviceCode\":\"device-01\",\"deviceTypeId\":\"sensor\",\"deviceSecret\":true,\"wifi_ssid\":\"ProjectSetup-A1B2\"}"
+  },
+  {
+    "name": "secret-control",
+    "valid": false,
+    "source": "{\"version\":1,\"portalServer\":\"portal.test/api\",\"deviceCode\":\"device-01\",\"deviceTypeId\":\"sensor\",\"deviceSecret\":\"bad\\nsecret\",\"wifi_ssid\":\"ProjectSetup-A1B2\"}"
+  },
+  {
+    "name": "secret-nul",
+    "valid": false,
+    "source": "{\"version\":1,\"portalServer\":\"portal.test/api\",\"deviceCode\":\"device-01\",\"deviceTypeId\":\"sensor\",\"deviceSecret\":\"bad\\u0000secret\",\"wifi_ssid\":\"ProjectSetup-A1B2\"}"
+  },
+  {
+    "name": "ssid-del",
+    "valid": false,
+    "source": "{\"version\":1,\"portalServer\":\"portal.test/api\",\"deviceCode\":\"device-01\",\"deviceTypeId\":\"sensor\",\"deviceSecret\":\"provisioning-secret\",\"wifi_ssid\":\"badssid\"}"
+  },
+  {
+    "name": "oversized",
+    "valid": false,
+    "source": "{\"version\":1,\"portalServer\":\"portal.test/api\",\"deviceCode\":\"device-01\",\"deviceTypeId\":\"sensor\",\"deviceSecret\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\",\"wifi_ssid\":\"ProjectSetup-A1B2\"}"
+  },
+  {
+    "name": "missing-version",
+    "valid": false,
+    "source": "{\"portalServer\":\"portal.test/api\",\"deviceCode\":\"device-01\",\"deviceTypeId\":\"sensor\",\"deviceSecret\":\"provisioning-secret\",\"wifi_ssid\":\"ProjectSetup-A1B2\"}"
+  },
+  {
+    "name": "missing-portalServer",
+    "valid": false,
+    "source": "{\"version\":1,\"deviceCode\":\"device-01\",\"deviceTypeId\":\"sensor\",\"deviceSecret\":\"provisioning-secret\",\"wifi_ssid\":\"ProjectSetup-A1B2\"}"
+  },
+  {
+    "name": "missing-deviceCode",
+    "valid": false,
+    "source": "{\"version\":1,\"portalServer\":\"portal.test/api\",\"deviceTypeId\":\"sensor\",\"deviceSecret\":\"provisioning-secret\",\"wifi_ssid\":\"ProjectSetup-A1B2\"}"
+  },
+  {
+    "name": "missing-deviceTypeId",
+    "valid": false,
+    "source": "{\"version\":1,\"portalServer\":\"portal.test/api\",\"deviceCode\":\"device-01\",\"deviceSecret\":\"provisioning-secret\",\"wifi_ssid\":\"ProjectSetup-A1B2\"}"
+  },
+  {
+    "name": "missing-deviceSecret",
+    "valid": false,
+    "source": "{\"version\":1,\"portalServer\":\"portal.test/api\",\"deviceCode\":\"device-01\",\"deviceTypeId\":\"sensor\",\"wifi_ssid\":\"ProjectSetup-A1B2\"}"
+  },
+  {
+    "name": "missing-wifi_ssid",
+    "valid": false,
+    "source": "{\"version\":1,\"portalServer\":\"portal.test/api\",\"deviceCode\":\"device-01\",\"deviceTypeId\":\"sensor\",\"deviceSecret\":\"provisioning-secret\"}"
+  },
+  {
+    "name": "unknown-field",
+    "valid": false,
+    "source": "{\"version\":1,\"portalServer\":\"portal.test/api\",\"deviceCode\":\"device-01\",\"deviceTypeId\":\"sensor\",\"deviceSecret\":\"provisioning-secret\",\"wifi_ssid\":\"ProjectSetup-A1B2\",\"unused\":\"value\"}"
+  },
+  {
+    "name": "array",
+    "valid": false,
+    "source": "[]"
+  },
+  {
+    "name": "null",
+    "valid": false,
+    "source": "null"
+  }
+]
