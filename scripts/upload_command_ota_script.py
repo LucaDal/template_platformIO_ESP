@@ -11,6 +11,7 @@ from requests import RequestException, get, put
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from scripts.project_config import load_dotenv
+from scripts.ota_size import report_upload_size
 
 URL_VERSION = "https://{}/ota/firmware/version"
 URL_UPLOAD = "https://{}/ota/firmware"
@@ -157,10 +158,14 @@ def start_upload(firmware_path, device_type_id, ip, email, password, compress=Fa
             return False
 
     firmware = Path(firmware_path).read_bytes()
+    original = firmware
     filename = Path(firmware_path).name
     if compress:
         firmware = gzip.compress(firmware, mtime=0)
         filename += ".gz"
+
+    if not report_upload_size(firmware_path, original, firmware, compress):
+        return False
 
     res = put(
         url=URL_UPLOAD.format(ip),

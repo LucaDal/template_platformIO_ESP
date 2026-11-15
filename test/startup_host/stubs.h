@@ -94,6 +94,19 @@ struct MyDeviceProperties {
   FakeDocument &json() { return document; }
 };
 struct MQTTManager {
+  enum class Error { None };
+  struct ErrorInfo {
+    Error code = Error::None;
+    const char *message = "No error";
+    int mqttError = 0, connack = 0, httpStatus = 0, tlsError = 0;
+  };
+  bool reconnect = true;
+  void (*connectedCallback)() = nullptr;
+  void (*disconnectedCallback)() = nullptr;
+  void onConnected(void (*callback)()) { connectedCallback = callback; }
+  void onDisconnected(void (*callback)()) { disconnectedCallback = callback; }
+  void resume() { reconnect = true; }
+  ErrorInfo lastError() { return {}; }
   template<class Callback> bool begin(const char *, const char *, const char *, Callback) {
     mock::events.push_back("mqtt.begin");
     return mock::mqttReady;
@@ -103,10 +116,25 @@ struct MQTTManager {
     assert(mock::wifiConnected && mock::otaCalls > 0);
     ++mock::mqttCalls;
     mock::events.push_back("mqtt.connect");
-    return mock::mqttConnected = true;
+    mock::mqttConnected = true;
+    if (connectedCallback) connectedCallback();
+    return true;
   }
-  void disconnect() { mock::events.push_back("mqtt.disconnect"); mock::mqttConnected = false; }
-  bool loop() { return mock::mqttConnected; }
+  void disconnect() {
+    reconnect = false;
+    mock::events.push_back("mqtt.disconnect");
+    if (mock::mqttConnected && disconnectedCallback) disconnectedCallback();
+    mock::mqttConnected = false;
+  }
+  bool loop() {
+    if (!mock::wifiConnected) {
+      mock::events.push_back("mqtt.disconnect");
+      mock::mqttConnected = false;
+      return false;
+    }
+    if (!mock::mqttConnected && reconnect) return connect();
+    return mock::mqttConnected;
+  }
 };
 #ifndef TEST_REAL_OTA
 struct SimpleOTA {

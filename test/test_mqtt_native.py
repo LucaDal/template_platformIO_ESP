@@ -14,13 +14,14 @@ class MqttNativeTest(unittest.TestCase):
             self.skipTest("Requires c++ and installed PlatformIO ArduinoJson dependencies")
         manager = root / "my-esp-libraries/MQTTManager"
         with tempfile.TemporaryDirectory() as directory:
-            for name in ("configuration", "manager"):
+            for name, platform in (("configuration", "ESP32"), ("manager", "ESP32"),
+                                   ("features", "ESP32"), ("features", "ESP8266")):
                 binary = Path(directory) / name
-                command = [compiler, "-std=c++17", "-DUSE_TLS", "-DESP32",
+                command = [compiler, "-std=c++17", "-DUSE_TLS", "-D" + platform,
                            "-I" + str(root / "test/mqtt_host"),
                            "-I" + str(arduino_json), "-I" + str(manager),
                            str(root / ("test/test_mqtt_" + name + ".cpp"))]
-                if name == "manager":
+                if name != "configuration":
                     command.append(str(manager / "MQTTManager.cpp"))
                 subprocess.run(command + ["-o", str(binary)], check=True)
                 subprocess.run([str(binary)], check=True)

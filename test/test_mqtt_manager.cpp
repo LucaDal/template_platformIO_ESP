@@ -56,7 +56,9 @@ int main() {
   mock::reset();
   mock::response = configuration;
   {
-    MQTTManager mqtt;
+    MQTTManager::Options options;
+    options.configurationTtlMs = 0;
+    MQTTManager mqtt(options);
     assert(!mqtt.begin("portal.test/api", "", "secret"));
     assert(mqtt.begin("portal.test/api", "A", "secret"));
     assert(mqtt.connect());
@@ -103,7 +105,7 @@ int main() {
     assert(!mqtt.connect() && mock::httpCalls == 1);
     mock::failedSubscription.clear();
     mock::now = 5000;
-    assert(mqtt.connect() && mock::httpCalls == 2);
+    assert(mqtt.connect() && mock::httpCalls == 1);
   }
   mock::reset();
   {

@@ -61,6 +61,14 @@ bool initializeDevice() {
     if (!otaSchedule.begin()) {
         LOG("Invalid OTA schedule; scheduled checks disabled.\n");
     }
+    mqttManager.onConnected([] { LOG("Connected to MQTT broker\n"); });
+    mqttManager.onDisconnected([] {
+        const auto &error = mqttManager.lastError();
+        if (error.code != MQTTManager::Error::None) {
+            LOG("MQTT disconnected: %s (MQTT=%d CONNACK=%d HTTP=%d TLS=%d)\n",
+                error.message, error.mqttError, error.connack, error.httpStatus, error.tlsError);
+        }
+    });
     if (!mqttManager.begin(setupMgr.portalServerIp(), setupMgr.deviceCode(), setupMgr.deviceSecret(), mqttCallback)) {
         LOG("MQTT initialization failed.");
         return false;
@@ -73,7 +81,6 @@ bool ensureWiFi() {
         wifiConnectedOnce = true;
         return true;
     }
-    mqttManager.disconnect();
     if (!wifiConnectedOnce && millis() - lastWiFiAttempt >= RETRY_INTERVAL_MS) {
         connectToWiFi();
     }
@@ -109,6 +116,7 @@ void updatePortalServices() {
     } else {
         otaSchedule.run(time(nullptr), checkOta);
     }
+    mqttManager.resume();
 }
 
 void setup() {
@@ -122,15 +130,17 @@ void setup() {
 }
 
 void loop() {
-    if (!initialized || !ensureWiFi()) {
+    if (!initialized) {
+        delay(10);
+        return;
+    }
+    if (!ensureWiFi()) {
+        if (!WiFi.isConnected()) mqttManager.loop();
         delay(10);
         return;
     }
 
     updatePortalServices();
-    if (!mqttManager.connected() && mqttManager.connect()) {
-        LOG("Connected to MQTT broker\n");
-    }
     mqttManager.loop();
 #ifdef ESP32
     // only for esp, to give space to its routines

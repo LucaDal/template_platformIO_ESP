@@ -15,3 +15,12 @@ env.Replace(COMPILATIONDB_INCLUDE_TOOLCHAIN=True)
 # Metti compile_commands.json nella root del progetto
 env.Replace(COMPILATIONDB_PATH=os.path.join("$PROJECT_DIR", "compile_commands.json"))
 
+
+def record_ota_flash_size(source, target, env):
+    from scripts.ota_size import write_flash_report
+    write_flash_report(env)
+
+
+if env.subst("$PIOPLATFORM") == "espressif8266" and env.GetProjectOption("upload_protocol", "") == "custom":
+    env.AddPreAction("upload", record_ota_flash_size)
+

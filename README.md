@@ -58,6 +58,8 @@ If stored Wi-Fi credentials fail during startup, the device opens a password-pro
 
 MQTT endpoint, credentials, and topics come from the portal. The client automatically subscribes to `subscribe` and `all` topics. Application code selects its own `publish` topics.
 
+`mqttManager.loop()` manages reconnects, backoff, keepalive, and deferred publications. The portal configuration is cached in RAM for five minutes and refreshed on expiry during reconnection or after rejected credentials. Connection callbacks report transitions. `publishJson()` supports exact catalog topics and topic paths, with per-message QoS 0/1 and configurable payload limits. Its bounded RAM queue defers callback publications and coalesces retained state updates. Intentional HTTPS maintenance uses `disconnect()` followed by `resume()`; it does not leave auto-reconnection disabled. See [MQTTManager](my-esp-libraries/MQTTManager/README.md) for limits, queue semantics, and structured errors.
+
 OTA checks run at startup and in the daily window configured in `src/main.cpp`. MQTT disconnects during HTTPS maintenance requests to release TLS memory. See [the libraries](my-esp-libraries/README.md) for API details.
 
 ## OTA server upload
@@ -70,6 +72,8 @@ pio run -e esp32-c3-ota -t upload
 ```
 
 ESP8266 firmware is compressed with gzip. ESP32-C3 firmware remains uncompressed. These commands publish firmware to the server; devices install it during OTA checks.
+
+ESP8266 OTA uploads print the BIN/GZIP byte sizes and estimate available space from the same `Flash: used ... bytes from ... bytes` counters shown by PlatformIO. The estimate subtracts used flash from the build's firmware limit and compares the gzip size against that budget. An oversized gzip stops publication. This assumes devices run firmware of the same size and use the same layout as this build; sector alignment is not included. It is not a remote-device compatibility check. Standalone uploads without matching build metadata show `UNAVAILABLE` instead of claiming compatibility.
 
 ## Local checks
 

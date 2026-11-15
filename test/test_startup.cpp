@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
   setup();
   assert(mock::wifiAlive == 0);
   assert(mock::fetchCalls == 0 && mock::otaCalls == 0 && mock::mqttCalls == 0);
-  assert(mock::events[1] == "provisioning");
+  assert(std::find(mock::events.begin(), mock::events.end(), "provisioning") != mock::events.end());
 
   if (scenario == "storage-failure" || scenario == "missing-provisioning" || scenario == "mqtt-init-failure") {
     assert(!initialized && mock::wifiCalls == 0);

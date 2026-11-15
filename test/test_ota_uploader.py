@@ -1,5 +1,7 @@
 import gzip
+import hashlib
 import io
+import json
 import os
 from pathlib import Path
 import tempfile
@@ -96,6 +98,71 @@ class OtaUploaderTest(unittest.TestCase):
         self.assertEqual(content_type, "application/octet-stream")
         self.assertEqual(gzip.decompress(content), b"firmware")
         self.assertEqual(content, gzip.compress(b"firmware", mtime=0))
+
+    def test_esp8266_reports_gzip_size_and_platformio_headroom(self):
+        original = b"firmware"
+        with tempfile.TemporaryDirectory() as directory:
+            firmware = Path(directory) / "firmware.bin"
+            firmware.write_bytes(original)
+            Path(str(firmware) + ".ota-size.json").write_text(json.dumps({
+                "flash_used": 511913, "flash_total": 958448,
+                "firmware_sha256": hashlib.sha256(original).hexdigest(),
+            }))
+            with patch.object(uploader, "get_version_from_token", return_value="1.2.3"), \
+                 patch.object(uploader, "ask_version_bump", return_value="patch"), \
+                 patch.object(uploader, "put") as request, \
+                 patch("sys.stdout", new_callable=io.StringIO) as output:
+                request.return_value.text = '{"ok":"updated"}'
+                self.assertTrue(uploader.start_upload(firmware, "sensor", "portal.test/api", "admin", "password",
+                                                     compress=True))
+            report = output.getvalue()
+            compressed_size = len(request.call_args.kwargs["files"]["file"][1])
+            self.assertIn(f"Firmware GZIP: {compressed_size} bytes", report)
+            self.assertIn("PlatformIO Flash: used 511913 bytes from 958448 bytes", report)
+            self.assertIn("OTA budget (estimated): 446535 bytes", report)
+            self.assertIn(f"OTA size check: OK (estimated margin: {446535 - compressed_size} bytes)", report)
+            self.assertIn("installed firmware and flash layout match this build", report)
+
+    def test_oversized_gzip_is_not_published(self):
+        original = b"firmware"
+        with tempfile.TemporaryDirectory() as directory:
+            firmware = Path(directory) / "firmware.bin"
+            firmware.write_bytes(original)
+            Path(str(firmware) + ".ota-size.json").write_text(json.dumps({
+                "flash_used": 511913, "flash_total": 511920,
+                "firmware_sha256": hashlib.sha256(original).hexdigest(),
+            }))
+            with patch.object(uploader, "get_version_from_token", return_value="1.2.3"), \
+                 patch.object(uploader, "ask_version_bump", return_value="patch"), \
+                 patch.object(uploader, "put") as request, \
+                 patch("sys.stdout", new_callable=io.StringIO) as output:
+                self.assertFalse(uploader.start_upload(firmware, "sensor", "portal.test/api", "admin", "password",
+                                                      compress=True))
+                request.assert_not_called()
+                self.assertIn("OTA size check: INSUFFICIENT", output.getvalue())
+                self.assertIn("Upload cancelled", output.getvalue())
+
+    def test_missing_or_stale_flash_values_never_report_ok(self):
+        original = b"firmware"
+        with tempfile.TemporaryDirectory() as directory:
+            firmware = Path(directory) / "firmware.bin"
+            firmware.write_bytes(original)
+            for report in (None, "invalid json", "[]", json.dumps({
+                    "flash_used": 511913, "flash_total": 958448, "firmware_sha256": "old-firmware"})):
+                metadata = Path(str(firmware) + ".ota-size.json")
+                if report is not None:
+                    metadata.write_text(report)
+                with self.subTest(report=report), \
+                     patch.object(uploader, "get_version_from_token", return_value="1.2.3"), \
+                     patch.object(uploader, "ask_version_bump", return_value="patch"), \
+                     patch.object(uploader, "put") as request, \
+                     patch("sys.stdout", new_callable=io.StringIO) as output:
+                    request.return_value.text = '{"ok":"updated"}'
+                    self.assertTrue(uploader.start_upload(firmware, "sensor", "portal.test/api", "admin", "password",
+                                                         compress=True))
+                    request.assert_called_once()
+                    self.assertIn("OTA size check: UNAVAILABLE", output.getvalue())
+                    self.assertNotIn("OTA size check: OK", output.getvalue())
 
     def test_failed_upload_is_reported_to_platformio(self):
         with patch.object(uploader, "get_ota_config", return_value=("portal.test/api", "sensor", "admin", "password")), \
